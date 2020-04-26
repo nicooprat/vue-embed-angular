@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve:vue": "vue-cli-service serve",
+    "serve:angular": "cd angular && npx serve -p 5000",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
