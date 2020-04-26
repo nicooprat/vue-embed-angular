@@ -1,20 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <title>AngularJS Sandbox</title>
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
-  </head>
 
-  <body ng-app="appModule">
-    <app></app>
-    <script src="https://unpkg.com/angular@1.7.5/angular.min.js"></script>
-    <script src="https://unpkg.com/@uirouter/angularjs@1.0.20/release/angular-ui-router.min.js"></script>
-    <script src="app.js"></script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>AngularJS Sandbox</title>
+  <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body ng-app="appModule">
+  <app></app>
+  <script src="https://unpkg.com/angular@1.7.5/angular.min.js"></script>
+  <script src="https://unpkg.com/@uirouter/angularjs@1.0.20/release/angular-ui-router.min.js"></script>
+  <script>
+    (function (window, angular) {
+      "use strict"; // eslint-disable-line strict
+      var appModule = angular.module("appModule", ["ui.router"]);
+
+      if (window.self !== window.top) {
+        // Add class to override styles
+        document.querySelector("html").className += " v2";
+        // Watch for height change
+        const resizeObserver = new ResizeObserver(() => {
+          // Can't use entry.contentRect because of polyfill misbehavior
+          parent.window.postMessage(
+            {iframeHeight: document.body.offsetHeight},
+            "*"
+          );
+        });
+        resizeObserver.observe(document.body);
+        // Watch for URL change
+        window.onpopstate = () => {
+          parent.window.postMessage({iframeUrl: location.href}, "*");
+        };
+      }
+
+      // Router
+      appModule.config([
+        "$locationProvider",
+        "$stateProvider",
+        "$urlRouterProvider",
+        function ($locationProvider, $stateProvider, $urlRouterProvider) {
+          // $locationProvider.html5Mode(true);
+
+          $stateProvider.state({
+            name: "home",
+            url: "/",
+            template: "<app-home></app-home>"
+          });
+
+          $stateProvider.state({
+            name: "about",
+            url: "/about",
+            template: "<app-about></app-about>"
+          });
+
+          $urlRouterProvider.otherwise("/");
+        }
+      ]);
+
+      // App
+      appModule
+        .controller("appController", [
+          "$scope",
+          function ($scope) {
+            // $scope
+          }
+        ])
+        .directive("app", function () {
+          return {
+            restrict: "E",
+            template: `
+                  <div class="p-8 text-gray-800 bg-gray-100">
+                    <app-nav></app-nav>
+                    <ui-view></ui-view>
+                  </div>
+                `,
+            controller: "appController",
+            scope: {},
+            link: function (scope, el, attrs) {}
+          };
+        });
+
+      // Nav
+      appModule
+        .controller("appNavController", [
+          "$scope",
+          "$transitions",
+          function ($scope, $transitions) {
+            $scope.isNavCollapsed = true;
+
+            $scope.onClick = function () {
+              $scope.isNavCollapsed = !$scope.isNavCollapsed;
+            };
+
+            $transitions.onSuccess({}, function () {
+              $scope.isNavCollapsed = true;
+            });
+          }
+        ])
+        .directive("appNav", function () {
+          return {
+            restrict: "E",
+            template: `
+                  <nav class="mb-4">
+                    <h1 class="text-2xl font-bold mb-4" style="color: #cc0026;">
+                      Angular
+                    </h1>
+                    <nav class="flex">
+                      <a class="underline mr-4" ui-sref="home" ui-sref-active="no-underline font-bold">
+                        Home
+                      </a>
+                      <a class="underline mr-4" ui-sref="about" ui-sref-active="no-underline font-bold">
+                        About
+                      </a>
+                    </nav>
+                  </nav>
+                `,
+            controller: "appNavController",
+            scope: {},
+            link: function (scope, el, attrs) {}
+          };
+        });
+
+      // Home
+      appModule
+        .controller("appHomeController", [
+          "$scope",
+          function ($scope) {
+            // $scope
+          }
+        ])
+        .directive("appHome", function () {
+          return {
+            restrict: "E",
+            template: `
+                  <div>
+                    <p>Click a nav above and see that the URL has been updated in your browser!</p>
+                  </div>
+                `,
+            controller: "appHomeController",
+            scope: {
+              message: "@"
+            },
+            link: function (scope, el, attrs) {}
+          };
+        });
+
+      // About
+      appModule
+        .controller("appAboutController", [
+          "$scope",
+          function ($scope) {
+            // $scope
+          }
+        ])
+        .directive("appAbout", function () {
+          return {
+            restrict: "E",
+            template: `
+                  <div>
+                  	<p>No app reloading when switching between iframe pages.</p>
+                  	<br>
+                    <h2>The iframe height has been adjusted too.</h2>
+                  </div>
+                `,
+            controller: "appAboutController",
+            scope: {
+              message: "@"
+            },
+            link: function (scope, el, attrs) {}
+          };
+        });
+    })(window, window.angular);
+  </script>
+</body>
+
 </html>

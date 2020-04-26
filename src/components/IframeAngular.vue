@@ -15,7 +15,11 @@ export default {
   },
   computed: {
     iframeSrc() {
-      return `http://localhost:5000/#!${this.$route.meta.iframe}`;
+      const angularUrl =
+        process.env.NODE_ENV === "production"
+          ? "/angular"
+          : "http://localhost:5000";
+      return `${angularUrl}/#!${this.$route.meta.iframe}`;
     }
   },
   mounted() {
